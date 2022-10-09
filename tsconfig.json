@@ -3,23 +3,19 @@
     "experimentalDecorators": true,
     "moduleResolution": "Node",
     "target": "ES5",
-    "module": "ES6",
+    "module": "commonjs",
     "esModuleInterop": true,
-    "jsx": "react",
-    "inlineSourceMap": true,
     "skipLibCheck": true,
     "declaration": true,
-    "baseUrl": "./src",
-    "outDir": "./esm",
     "resolveJsonModule": true,
     "allowJs": true,
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
-    }
+    "sourceMap": true,
+    "lib": [
+      "esnext",
+      "dom"
+    ]
   },
-  "include": [
-    "./src/**/*"
+  "exclude": [
+    "node_modules"
   ]
 }

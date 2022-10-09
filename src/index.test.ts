@@ -1,8 +1,9 @@
-import { sayHello } from '@/index';
+import { launch } from '@/index';
 
 describe('test hello', () => {
-  it('should success', () => {
-    const data = sayHello();
-    expect(data).toEqual('cut!hit!');
+  it('should success', async () => {
+    await launch({
+      title: 'claire',
+    });
   });
 });

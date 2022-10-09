@@ -5,18 +5,20 @@
     "lint": "eslint src",
     "format": "prettier --write src",
     "test": "jest",
-    "build:esm": "gulp buildEsm",
-    "build": "npm run build:esm && rollup -c",
+    "watch:esm": "gulp watchEsm",
+    "build:cjs": "tsc -p src/tsconfig.json",
+    "build:esm": "tsc -p src/tsconfig-es.json",
+    "build": "npm run build:cjs",
     "prepublishOnly": "tnpm run build"
   },
   "types": "./esm/index.d.ts",
   "module": "./esm/index.js",
   "main": "./dist/index.js",
   "dependencies": {
+    "chrome-paths": "^1.0.1",
     "inversify": "^6.0.1",
     "puppeteer-core": "^18.2.1",
-    "reflect-metadata": "^0.1.13",
-    "chrome-paths": "^1.0.1"
+    "reflect-metadata": "^0.1.13"
   },
   "license": "MIT",
   "devDependencies": {
@@ -39,6 +41,7 @@
     "rollup": "^2.79.1",
     "rollup-plugin-dts": "^4.2.2",
     "ts-jest": "^29.0.3",
+    "tsc-alias": "^1.7.0",
     "typescript": "^4.8.4"
   },
   "files": [

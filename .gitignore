@@ -130,3 +130,4 @@ lib
 ./coverage
 storybook-static
 esm
+cjs

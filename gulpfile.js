@@ -11,7 +11,7 @@ const tsProject = ts.createProject('tsconfig.json', {
 function tsCompiler() {
   return tsProject
     .src()
-    .pipe(alias({configuration: tsProject.config}))
+    .pipe(alias({ configuration: tsProject.config }))
     .pipe(tsProject())
     .pipe(gulp.dest('esm'));
 }
@@ -25,9 +25,10 @@ function cleanTask() {
 }
 
 function copyLess() {
-  return gulp
-    .src(['./src/**/*.less', './src/**/*.css'])
-    .pipe(gulpCopy('esm', {prefix: 1}));
+  return gulp.src(['./src/**/*.less', './src/**/*.css']).pipe(gulpCopy('esm', { prefix: 1 }));
 }
 
 exports.buildEsm = gulp.series(cleanTask, gulp.series(tsCompiler, copyLess));
+exports.watchEsm = function () {
+  return gulp.watch(['./src/**/*.ts', './src/**/*.tsx'], gulp.series(tsCompiler, copyLess));
+};

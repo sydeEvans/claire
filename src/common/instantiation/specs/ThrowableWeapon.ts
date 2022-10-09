@@ -8,7 +8,7 @@ export interface IThrowableWeapon {
 export const IThrowableWeapon = createDecorator<IThrowableWeapon>('IThrowableWeapon');
 
 export class Shuriken implements IThrowableWeapon {
-  num;
+  num: number;
 
   throw(): string {
     return 'hit!';

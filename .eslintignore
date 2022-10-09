@@ -1,6 +1,4 @@
 /node_modules
-/out
-/lib
-/storybook-static
 /coverage
 /esm
+/cjs
