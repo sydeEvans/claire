@@ -1,7 +1,3 @@
-# A typescript lib starter repo
+#  headful Node app framework
 
-## Installation
 
-```bash
-$ npx dgit gramlib/es-code-starter my-awesome-app
-```
