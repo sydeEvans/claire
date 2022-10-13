@@ -41,6 +41,7 @@ export async function launch(options: IOptions) {
     `;
 
   const args = [
+    '--test-type',
     `--app=data:text/html,${targetPage}`,
     '--enable-features=NetworkService,NetworkServiceInProcess',
   ];
@@ -54,12 +55,14 @@ export async function launch(options: IOptions) {
   }
 
   let browser: puppeteer.Browser;
+
   try {
     browser = await puppeteer.launch({
       executablePath,
       pipe: true,
       defaultViewport: null,
-      headless: true,
+      headless: false,
+      ignoreDefaultArgs: ['--enable-automation'],
       args,
     });
   } catch (e: any) {
