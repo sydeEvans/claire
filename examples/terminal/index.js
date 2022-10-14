@@ -1,11 +1,14 @@
-const { launch } = require('../../src');
+const { App } = require('../../cjs');
+const fs = require('fs');
+const path = require('path');
 
 async function main() {
-  const browser = await launch({
-    title: 'app',
-  });
+  const app = App();
 
-  console.log(browser);
+  await app.launch({
+    title: 'app',
+    icon: fs.readFileSync(path.join(__dirname, 'app_icon.png')).toString('base64'),
+  });
 }
 
 main().catch((e) => console.log(e));

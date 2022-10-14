@@ -5,6 +5,9 @@
     "lint": "eslint src",
     "format": "prettier --write src",
     "test": "jest",
+    "watch": "tsc -w -p src/tsconfig.json",
+    "watch:alias": "tsc-alias -w -p src/tsconfig.json",
+    "build:watch": "npm run build && (concurrently 'npm:watch' 'npm:watch:alias')",
     "build": "tsc -p src/tsconfig.json && tsc-alias -p src/tsconfig.json",
     "prepublishOnly": "tnpm run build"
   },
@@ -14,7 +17,8 @@
     "chrome-paths": "^1.0.1",
     "inversify": "^6.0.1",
     "puppeteer-core": "^18.2.1",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.13",
+    "uuid": "^9.0.0"
   },
   "license": "MIT",
   "devDependencies": {
@@ -24,6 +28,7 @@
     "@types/jest": "^29.1.2",
     "@typescript-eslint/eslint-plugin": "^5.39.0",
     "@typescript-eslint/parser": "^5.39.0",
+    "concurrently": "^7.4.0",
     "eslint": "^8.25.0",
     "eslint-config-ali": "^14.0.2",
     "eslint-import-resolver-typescript": "^3.5.1",
