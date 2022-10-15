@@ -1,7 +1,7 @@
 import { findChrome } from '@/common/utils/findChrome';
 import puppeteer from 'puppeteer-core';
 import { createDecorator } from '@/common/instantiation/createDecorator';
-import { IWindowManager } from '@/browser/WindowManager';
+import { IWindowManager } from '@/main/browser/WindowManager';
 
 export interface IBrowserOptions {
   title: string;
@@ -19,6 +19,9 @@ export interface IBrowserOptions {
 export interface IBrowser {
   launch: (opt: IBrowserOptions) => Promise<puppeteer.Browser>;
   loadUrl: (url: string) => Promise<void>;
+  expoFunction: (name: string, func: Function) => Promise<void>;
+
+  onExit: (cb: () => void) => void;
 }
 export const IBrowser = createDecorator<IBrowser>('puppeteer.Browser');
 
@@ -49,13 +52,21 @@ export class Browser implements IBrowser {
     await this.cdpSession.send('Browser.setDockTile', { image: this.options.icon });
   }
 
+  expoFunction(name: string, func: Function) {
+    return this.windowManager.mainWindow.expoFunction(name, func);
+  }
+
+  onExit(callback) {
+    this.windowManager.mainWindow.on('close', callback);
+  }
+
   async loadUrl(url: string) {
     await this.windowManager.mainWindow.loadUrl(url);
   }
 
   async launch(opt: IBrowserOptions) {
     this.setOptions(opt);
-    const options = this.options;
+    const { options } = this;
     const executablePath = findChrome();
 
     if (!executablePath) {

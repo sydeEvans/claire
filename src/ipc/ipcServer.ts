@@ -1,5 +1,5 @@
 import type { ChildProcess } from 'child_process';
-import { createIPCMessage, parseIPCMessage } from '@/ipc/shared';
+import { createIPCMessage, IPC_PROTOCOL_TYPE, parseIPCMessage } from '@/ipc/shared';
 import { IpcRequestData } from '@/ipc/types';
 import * as uuid from 'uuid';
 
@@ -12,7 +12,7 @@ export class IpcServer {
     this.receiveProcess = receiveProcess;
     this.receiveProcess.on('message', async (message: any) => {
       // 处理消息
-      const requestData = parseIPCMessage(message) as IpcRequestData;
+      const requestData = parseIPCMessage(IPC_PROTOCOL_TYPE.request, message) as IpcRequestData;
       if (!requestData) {
         // 非法消息
         return;
@@ -32,7 +32,7 @@ export class IpcServer {
       }
 
       this.receiveProcess.send(
-        createIPCMessage({
+        createIPCMessage(IPC_PROTOCOL_TYPE.request, {
           id: uuid.v4(),
           requestId: requestData.id,
           payload: resp,
@@ -40,5 +40,18 @@ export class IpcServer {
         }),
       );
     });
+  }
+
+  sendServerEvent(id: string, event: string, args: any[]) {
+    this.receiveProcess.send(
+      createIPCMessage(IPC_PROTOCOL_TYPE.event, {
+        id: uuid.v4(),
+        payload: {
+          service: id,
+          method: event,
+          args,
+        },
+      }),
+    );
   }
 }

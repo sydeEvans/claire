@@ -1,28 +1,23 @@
-import * as child_process from 'child_process';
-import * as path from 'path';
-import type { IBrowserOptions } from '@/browser/Browser';
+import type { IBrowserOptions } from '@/main/browser/Browser';
 import { InstantiationService, ServiceCollection } from '@/common/instantiation';
 import { ServicesAccessor } from '@/common/instantiation/instantiationService';
-import { IpcClient } from '@/ipc/ipcClient';
-import { ChildProcess } from 'child_process';
-import { ServiceIdentifier } from '@/common/instantiation/serviceIdentifier';
-import { IBrowser } from '@/browser/Browser';
+import { Browser, IBrowser } from '@/main/browser/Browser';
 import { ISimpleHttpServer, SimpleHttpServer } from '@/main/SimpleHttpServer';
-
-interface Accessor {
-  get<T>(id: ServiceIdentifier<T>): T;
-}
+import { EventEmitter } from 'events';
+import { IWindowManager, WindowManager } from '@/main/browser/WindowManager';
 
 interface IApplicationOptions {
   browserOptions: IBrowserOptions;
-  serverFolder: string;
+  serverFolder?: string;
+  serverOrigin?: string;
 }
 
-export class Application {
+export class Application extends EventEmitter {
   private accessor: ServicesAccessor;
-  private ipcAccessor: ServicesAccessor;
+  private opts: IApplicationOptions;
 
   constructor() {
+    super();
     this.createService();
   }
 
@@ -31,40 +26,15 @@ export class Application {
 
     // register service
     services.set(ISimpleHttpServer, SimpleHttpServer);
+    services.set(IBrowser, Browser);
+    services.set(IWindowManager, WindowManager);
 
     const instantiationService = new InstantiationService(services);
     this.accessor = instantiationService.getAccessor();
   }
 
-  createIpcAccessor(proc: ChildProcess) {
-    const ipcClient = new IpcClient(proc);
-
-    const accessor: Accessor = {
-      get<T>(id: ServiceIdentifier<T>) {
-        const service = new Proxy(
-          {},
-          {
-            get(_, property: string) {
-              return (...params: any) => {
-                return ipcClient.invoke({
-                  service: id.toString(),
-                  method: property,
-                  args: params,
-                });
-              };
-            },
-          },
-        );
-
-        return service as T;
-      },
-    };
-
-    return accessor;
-  }
-
   get browserWindow() {
-    return this.ipcAccessor.get(IBrowser);
+    return this.accessor.get(IBrowser);
   }
 
   get httpServer() {
@@ -72,17 +42,29 @@ export class Application {
   }
 
   async launch(opts: IApplicationOptions) {
-    const windowScript = path.join(__dirname, '../browser/index');
-    const childProcess = child_process.fork(windowScript);
-    this.ipcAccessor = this.createIpcAccessor(childProcess);
-
-    this.httpServer.serve(opts.serverFolder);
-
+    this.opts = opts;
+    if (opts.serverFolder) {
+      this.httpServer.serve(opts.serverFolder);
+    }
     await this.browserWindow.launch(opts.browserOptions);
+
+    this.browserWindow.onExit(() => {
+      this.emit('exit');
+    });
   }
 
-  async load(entry) {
-    const url = this.httpServer.getEntryUrl(entry);
+  expoFunction(name: string, func: Function) {
+    console.log('expoFunction', name, func);
+    return this.browserWindow.expoFunction(name, func);
+  }
+
+  async load(entry: string) {
+    let url;
+    if (this.opts.serverFolder) {
+      url = this.httpServer.getEntryUrl(entry);
+    } else {
+      url = this.opts.serverOrigin + entry;
+    }
     await this.browserWindow.loadUrl(url);
   }
 }

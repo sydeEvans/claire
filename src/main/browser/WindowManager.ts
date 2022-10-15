@@ -1,6 +1,6 @@
 import { createDecorator } from '@/common/instantiation/createDecorator';
 import puppeteer from 'puppeteer-core';
-import { BrowserWindow } from '@/browser/Window';
+import { BrowserWindow } from '@/main/browser/Window';
 
 export interface IWindowManager {
   mainWindow: BrowserWindow;

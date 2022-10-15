@@ -9,3 +9,7 @@ export interface IpcResponseData {
   payload: any;
   error: any;
 }
+
+export interface IpcService {
+  on: () => void;
+}

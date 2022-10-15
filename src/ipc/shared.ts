@@ -1,8 +1,12 @@
 import { IpcRequestData, IpcResponseData } from '@/ipc/types';
 
-const protocol = 'claire-ipc';
+export enum IPC_PROTOCOL_TYPE {
+  request = 'claire_request',
+  event = 'claire_event',
+}
 
 export function parseIPCMessage(
+  protocol: string,
   msg: Record<string, IpcRequestData | IpcResponseData>,
 ): IpcRequestData | IpcResponseData | null {
   if (typeof msg === 'object' && msg[protocol]) {
@@ -12,6 +16,7 @@ export function parseIPCMessage(
 }
 
 export function createIPCMessage(
+  protocol: string,
   body: IpcRequestData | IpcResponseData,
 ): Record<string, IpcRequestData | IpcResponseData> {
   return { [protocol]: body };
