@@ -7,13 +7,20 @@ import { IpcClient } from '@/ipc/ipcClient';
 import { ChildProcess } from 'child_process';
 import { ServiceIdentifier } from '@/common/instantiation/serviceIdentifier';
 import { IBrowser } from '@/browser/Browser';
+import { ISimpleHttpServer, SimpleHttpServer } from '@/main/SimpleHttpServer';
 
 interface Accessor {
   get<T>(id: ServiceIdentifier<T>): T;
 }
 
+interface IApplicationOptions {
+  browserOptions: IBrowserOptions;
+  serverFolder: string;
+}
+
 export class Application {
   private accessor: ServicesAccessor;
+  private ipcAccessor: ServicesAccessor;
 
   constructor() {
     this.createService();
@@ -23,6 +30,7 @@ export class Application {
     const services = new ServiceCollection();
 
     // register service
+    services.set(ISimpleHttpServer, SimpleHttpServer);
 
     const instantiationService = new InstantiationService(services);
     this.accessor = instantiationService.getAccessor();
@@ -55,17 +63,26 @@ export class Application {
     return accessor;
   }
 
-  get browser() {
-    return this.accessor.get(IBrowser);
+  get browserWindow() {
+    return this.ipcAccessor.get(IBrowser);
   }
 
-  async launch(opts: IBrowserOptions) {
+  get httpServer() {
+    return this.accessor.get(ISimpleHttpServer);
+  }
+
+  async launch(opts: IApplicationOptions) {
     const windowScript = path.join(__dirname, '../browser/index');
-    const childProcess = child_process.fork(windowScript, [JSON.stringify(opts)]);
-    this.accessor = this.createIpcAccessor(childProcess);
+    const childProcess = child_process.fork(windowScript);
+    this.ipcAccessor = this.createIpcAccessor(childProcess);
 
-    await this.browser.launch(opts);
+    this.httpServer.serve(opts.serverFolder);
 
-    this.browser.logTarget();
+    await this.browserWindow.launch(opts.browserOptions);
+  }
+
+  async load(entry) {
+    const url = this.httpServer.getEntryUrl(entry);
+    await this.browserWindow.loadUrl(url);
   }
 }

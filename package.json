@@ -16,6 +16,8 @@
   "dependencies": {
     "chrome-paths": "^1.0.1",
     "inversify": "^6.0.1",
+    "koa": "^2.13.4",
+    "koa-static": "^5.0.0",
     "puppeteer-core": "^18.2.1",
     "reflect-metadata": "^0.1.13",
     "uuid": "^9.0.0"

@@ -6,9 +6,14 @@ async function main() {
   const app = App();
 
   await app.launch({
-    title: 'app',
-    icon: fs.readFileSync(path.join(__dirname, 'app_icon.png')).toString('base64'),
+    browserOptions: {
+      title: 'app',
+      icon: fs.readFileSync(path.join(__dirname, 'app_icon.png')).toString('base64'),
+    },
+    serverFolder: path.join(__dirname, 'www'),
   });
+
+  await app.load('index.html');
 }
 
 main().catch((e) => console.log(e));

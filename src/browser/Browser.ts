@@ -17,8 +17,8 @@ export interface IBrowserOptions {
 }
 
 export interface IBrowser {
-  logTarget: () => void;
   launch: (opt: IBrowserOptions) => Promise<puppeteer.Browser>;
+  loadUrl: (url: string) => Promise<void>;
 }
 export const IBrowser = createDecorator<IBrowser>('puppeteer.Browser');
 
@@ -49,8 +49,8 @@ export class Browser implements IBrowser {
     await this.cdpSession.send('Browser.setDockTile', { image: this.options.icon });
   }
 
-  logTarget() {
-    console.log(this.browser.target());
+  async loadUrl(url: string) {
+    await this.windowManager.mainWindow.loadUrl(url);
   }
 
   async launch(opt: IBrowserOptions) {
@@ -98,8 +98,8 @@ export class Browser implements IBrowser {
       });
       this.browser = browser;
       this.cdpSession = await browser.target().createCDPSession();
-      this.setDockIcon();
-      this.initMainWindow();
+      await this.setDockIcon();
+      await this.initMainWindow();
     } catch (e: any) {
       if (e.toString().includes('Target closed')) {
         throw new Error(
