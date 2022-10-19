@@ -58,7 +58,6 @@ export class Application extends EventEmitter {
   }
 
   expoFunction(name: string, func: Function) {
-    console.log('expoFunction', name, func);
     return this.browserWindow.expoFunction(name, func);
   }
 

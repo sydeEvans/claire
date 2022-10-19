@@ -5,6 +5,13 @@ import { BrowserWindow } from '@/main/browser/Window';
 export interface IWindowOptions {
   width?: number;
   height?: number;
+  userAgent?: string;
+}
+
+export interface IPendingWindow {
+  url: string;
+  options: IWindowOptions;
+  callback: (win: BrowserWindow) => void;
 }
 
 export interface IWindowManager {
@@ -19,7 +26,7 @@ export class WindowManager implements IWindowManager {
   mainWindow: BrowserWindow;
   private windows: BrowserWindow[] = [];
   private windowSeq = 0;
-  private pendingWindows_ = new Map<number, any>();
+  private pendingWindows_ = new Map<number, IPendingWindow>();
 
   createMainWindow(page: puppeteer.Page) {
     this.mainWindow = new BrowserWindow(this, page);
@@ -48,20 +55,27 @@ export class WindowManager implements IWindowManager {
     }
 
     const newTargetPageUrl = newTargetPage.url();
+    if (newTargetPageUrl === 'chrome://new-tab-page/') {
+      await newTargetPage.close();
+      return;
+    }
+
     const seq = newTargetPageUrl.startsWith('about:blank?seq=')
       ? newTargetPageUrl.substr('about:blank?seq='.length)
       : '';
 
     const params = this.pendingWindows_.get(Number(seq));
-
     if (!params) return;
 
     const { callback, options, url } = params;
-
     this.pendingWindows_.delete(Number(seq));
 
     if (options.width && options.height) {
       await newTargetPage.evaluate(`window.resizeTo(${options.width}, ${options.height})`);
+    }
+
+    if (options.userAgent) {
+      await newTargetPage.setUserAgent(options.userAgent);
     }
 
     const window = new BrowserWindow(this, newTargetPage);
