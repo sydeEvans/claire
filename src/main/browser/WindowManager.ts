@@ -16,8 +16,11 @@ export interface IPendingWindow {
 
 export interface IWindowManager {
   mainWindow: BrowserWindow;
-  createMainWindow: (page: puppeteer.Page) => void;
+  createMainWindow: (page: puppeteer.Page) => Promise<void>;
   createWindow: (url: string, options: IWindowOptions) => Promise<BrowserWindow>;
+  registerRpcDomain(domain: string, rpcDomainInstance: any): void;
+
+  registerCustomRpcMethod(method: string, func: Function): void;
 }
 
 export const IWindowManager = createDecorator<IWindowManager>('windowManager');
@@ -28,9 +31,57 @@ export class WindowManager implements IWindowManager {
   private windowSeq = 0;
   private pendingWindows_ = new Map<number, IPendingWindow>();
 
-  createMainWindow(page: puppeteer.Page) {
+  private rpcDomainMap: Map<string, any> = new Map();
+
+  async createMainWindow(page: puppeteer.Page) {
     this.mainWindow = new BrowserWindow(this, page);
     page.browser().on('targetcreated', this.targetCreated_.bind(this));
+    await this._bindBridge(page);
+  }
+
+  private async _bindBridge(page: puppeteer.Page) {
+    await page.evaluateOnNewDocument(`window.claire = {
+      call: (method, data, options) => {
+        __callBridge(method, data)
+          .then((res) => {
+            if (options?.success) {
+              options.success(res);
+            }
+          })
+          .catch((e) => {
+            if (options?.fail) {
+              options.fail(e);
+            }
+          });
+      },
+    };`);
+
+    await page.exposeFunction('__callBridge', async (bridge, data) => {
+      if (bridge === 'rpc') {
+        const { domain, method, params } = data;
+        const rpcDomain = this.rpcDomainMap.get(domain);
+        if (!rpcDomain) {
+          throw new Error(`rpc domain ${domain} not found`);
+        }
+
+        return rpcDomain[method](...params);
+      }
+    });
+  }
+
+  registerRpcDomain(domain: string, rpcDomainInstance: any) {
+    this.rpcDomainMap.set(domain, rpcDomainInstance);
+  }
+
+  private _CUSTOM_RPC_DOMAIN = 'Custom';
+
+  registerCustomRpcMethod(method: string, func: Function) {
+    let customDomain = this.rpcDomainMap.get(this._CUSTOM_RPC_DOMAIN);
+    if (!customDomain) {
+      customDomain = {};
+    }
+    customDomain[method] = func;
+    this.rpcDomainMap.set(this._CUSTOM_RPC_DOMAIN, customDomain);
   }
 
   async createWindow(url: string, options: IWindowOptions): Promise<BrowserWindow> {
@@ -78,6 +129,7 @@ export class WindowManager implements IWindowManager {
       await newTargetPage.setUserAgent(options.userAgent);
     }
 
+    this._bindBridge(newTargetPage);
     const window = new BrowserWindow(this, newTargetPage);
     this.windows.push(window);
 

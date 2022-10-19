@@ -50,6 +50,7 @@ export class Application extends EventEmitter {
     if (opts.serverFolder) {
       this.httpServer.serve(opts.serverFolder);
     }
+    this.registerInnerRpcDomain();
     await this.browserWindow.launch(opts.browserOptions);
 
     this.browserWindow.onExit(() => {
@@ -57,8 +58,16 @@ export class Application extends EventEmitter {
     });
   }
 
-  expoFunction(name: string, func: Function) {
-    return this.browserWindow.expoFunction(name, func);
+  registerInnerRpcDomain() {
+    this.windowManager.registerRpcDomain('App', {
+      close: () => {
+        process.exit();
+      },
+    });
+  }
+
+  registerRpcMethod(method: string, func: Function) {
+    this.windowManager.registerCustomRpcMethod(method, func);
   }
 
   async load(entry: string) {

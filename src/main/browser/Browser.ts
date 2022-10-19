@@ -49,7 +49,7 @@ export class Browser implements IBrowser {
     ]);
     const pages = await this.browser.pages();
     const seqPage = pages[0];
-    this.windowManager.createMainWindow(seqPage);
+    await this.windowManager.createMainWindow(seqPage);
   }
 
   private async setDockIcon() {

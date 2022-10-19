@@ -14,16 +14,11 @@ async function main() {
     serverOrigin: 'http://localhost:5173/',
   });
 
-  await app.load('index.html');
-
-  await app.expoFunction('openWindow', async (url) => {
-    const newWindow = await app.createWindow(url, {
-      width: 390,
-      height: 884,
-      userAgent: 'Mozilla/5.0 (Linux; Android 10; Pixel 3 XL)',
-    });
-    return newWindow.getDevtoolsUrl();
+  app.registerRpcMethod('log', async (...args) => {
+    console.log(...args);
   });
+
+  await app.load('index.html');
 
   app.on('exit', () => {
     process.exit();
