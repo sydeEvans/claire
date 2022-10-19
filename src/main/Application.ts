@@ -4,7 +4,7 @@ import { ServicesAccessor } from '@/common/instantiation/instantiationService';
 import { Browser, IBrowser } from '@/main/browser/Browser';
 import { ISimpleHttpServer, SimpleHttpServer } from '@/main/SimpleHttpServer';
 import { EventEmitter } from 'events';
-import { IWindowManager, WindowManager } from '@/main/browser/WindowManager';
+import { IWindowManager, IWindowOptions, WindowManager } from '@/main/browser/WindowManager';
 
 interface IApplicationOptions {
   browserOptions: IBrowserOptions;
@@ -37,6 +37,10 @@ export class Application extends EventEmitter {
     return this.accessor.get(IBrowser);
   }
 
+  get windowManager() {
+    return this.accessor.get(IWindowManager);
+  }
+
   get httpServer() {
     return this.accessor.get(ISimpleHttpServer);
   }
@@ -66,5 +70,9 @@ export class Application extends EventEmitter {
       url = this.opts.serverOrigin + entry;
     }
     await this.browserWindow.loadUrl(url);
+  }
+
+  async createWindow(url: string, options: IWindowOptions) {
+    return await this.windowManager.createWindow(url, options);
   }
 }

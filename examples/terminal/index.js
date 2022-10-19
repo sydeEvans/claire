@@ -1,4 +1,4 @@
-const { App } = require('../../cjs');
+const { App } = require('../../cjs/index.js');
 const fs = require('fs');
 const path = require('path');
 
@@ -19,6 +19,21 @@ async function main() {
       os: process.arch,
       env: process.env,
     };
+  });
+
+  await app.expoFunction('openWindow', async (url) => {
+    const newWindow = await app.createWindow(url, {
+      width: 390,
+      height: 884,
+    });
+    return newWindow.getDevtoolsUrl();
+  });
+
+  await app.expoFunction('openDevtools', async (url) => {
+    await app.createWindow(url, {
+      width: 800,
+      height: 600,
+    });
   });
 
   await app.load('index.html');

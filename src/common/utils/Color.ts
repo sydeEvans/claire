@@ -378,7 +378,8 @@ export class Color {
         )}`.toLowerCase();
       case Color.Format.ShortHEXA:
         const hexFormat = this.detectHEXFormat();
-        if (hexFormat !== Color.Format.ShortHEXA && hexFormat !== Color.Format.ShortHEX) return null;
+        if (hexFormat !== Color.Format.ShortHEXA && hexFormat !== Color.Format.ShortHEX)
+          return null;
         return `#${toShortHexValue(this._rgba[0])}${toShortHexValue(
           this._rgba[1],
         )}${toShortHexValue(this._rgba[2])}${toShortHexValue(this._rgba[3])}`.toLowerCase();

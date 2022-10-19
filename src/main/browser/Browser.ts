@@ -2,6 +2,10 @@ import { findChrome } from '@/common/utils/findChrome';
 import puppeteer from 'puppeteer-core';
 import { createDecorator } from '@/common/instantiation/createDecorator';
 import { IWindowManager } from '@/main/browser/WindowManager';
+import { addExtra } from 'puppeteer-extra';
+import puppeteer_extra_plugin_devtools from 'puppeteer-extra-plugin-devtools';
+
+const devtools = puppeteer_extra_plugin_devtools();
 
 export interface IBrowserOptions {
   title: string;
@@ -98,10 +102,15 @@ export class Browser implements IBrowser {
     let browser: puppeteer.Browser;
 
     try {
-      browser = await puppeteer.launch({
+      const extraPp = addExtra(puppeteer);
+
+      // use puppeteer-extra plugin
+      extraPp.use(devtools);
+
+      browser = await extraPp.launch({
         executablePath,
         devtools: false,
-        pipe: true,
+        // pipe: true,
         defaultViewport: null,
         headless: false,
         ignoreDefaultArgs: ['--enable-automation'],

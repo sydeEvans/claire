@@ -2,8 +2,8 @@
   "name": "code-starter",
   "version": "0.0.1",
   "scripts": {
-    "lint": "eslint src",
-    "format": "prettier --write src",
+    "lint": "eslint .",
+    "format": "prettier --write .",
     "test": "jest",
     "watch": "tsc -w -p src/tsconfig.json",
     "watch:alias": "tsc-alias -w -p src/tsconfig.json",
@@ -19,6 +19,8 @@
     "koa": "^2.13.4",
     "koa-static": "^5.0.0",
     "puppeteer-core": "^18.2.1",
+    "puppeteer-extra": "^3.3.4",
+    "puppeteer-extra-plugin-devtools": "^2.4.4",
     "reflect-metadata": "^0.1.13",
     "uuid": "^9.0.0"
   },

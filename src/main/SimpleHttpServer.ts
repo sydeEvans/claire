@@ -9,7 +9,7 @@ export interface ISimpleHttpServer {
 export const ISimpleHttpServer = createDecorator<ISimpleHttpServer>('ISimpleHttpServer');
 
 export class SimpleHttpServer implements ISimpleHttpServer {
-  private innerPort: number = 42000;
+  private innerPort = 42000;
 
   serve(folder) {
     const koa = new Koa();
