@@ -1,0 +1,14 @@
+.app{
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.tabPane {
+    height: 90vh;
+}
+
+.iframe{
+    height: 100%;
+    width: 100%;
+}

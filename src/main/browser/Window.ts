@@ -20,7 +20,6 @@ export class BrowserWindow extends EventEmitter {
   }
 
   async dispatchEvent(name: string, data: any) {
-    console.log(name, data, '----');
     await this.page.evaluate(() => {
       const event = new CustomEvent(`claire_message${name}`, {});
       document.dispatchEvent(event);
