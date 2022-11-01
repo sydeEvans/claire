@@ -70,6 +70,10 @@ export class Application extends EventEmitter {
     this.windowManager.registerCustomRpcMethod(method, func);
   }
 
+  dispatchEvent(name: string, data: any) {
+    this.windowManager.dispatchEvent(name, data);
+  }
+
   async load(entry: string) {
     let url;
     if (this.opts.serverFolder) {

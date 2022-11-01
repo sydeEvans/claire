@@ -18,9 +18,9 @@ export interface IWindowManager {
   mainWindow: BrowserWindow;
   createMainWindow: (page: puppeteer.Page) => Promise<void>;
   createWindow: (url: string, options: IWindowOptions) => Promise<BrowserWindow>;
-  registerRpcDomain(domain: string, rpcDomainInstance: any): void;
-
-  registerCustomRpcMethod(method: string, func: Function): void;
+  registerRpcDomain: (domain: string, rpcDomainInstance: any) => void;
+  registerCustomRpcMethod: (method: string, func: Function) => void;
+  dispatchEvent: (name: string, data: any) => void;
 }
 
 export const IWindowManager = createDecorator<IWindowManager>('windowManager');
@@ -40,7 +40,8 @@ export class WindowManager implements IWindowManager {
   }
 
   private async _bindBridge(page: puppeteer.Page) {
-    await page.evaluateOnNewDocument(`window.claire = {
+    await page.evaluateOnNewDocument(`
+    window.claire = {
       call: (method, data, options) => {
         __callBridge(method, data)
           .then((res) => {
@@ -54,6 +55,9 @@ export class WindowManager implements IWindowManager {
             }
           });
       },
+      on: (name, callback) => {
+        document.addEventListener('claire_message' + name, callback);
+      }
     };`);
 
     await page.exposeFunction('__callBridge', async (bridge, data) => {
@@ -67,6 +71,10 @@ export class WindowManager implements IWindowManager {
         return rpcDomain[method](...params);
       }
     });
+  }
+
+  dispatchEvent(name: string, data: any) {
+    this.mainWindow.dispatchEvent(name, data);
   }
 
   registerRpcDomain(domain: string, rpcDomainInstance: any) {

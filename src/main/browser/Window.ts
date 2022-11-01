@@ -19,6 +19,14 @@ export class BrowserWindow extends EventEmitter {
     return this.page.exposeFunction(name, func);
   }
 
+  async dispatchEvent(name: string, data: any) {
+    console.log(name, data, '----');
+    await this.page.evaluate(() => {
+      const event = new CustomEvent(`claire_message${name}`, {});
+      document.dispatchEvent(event);
+    });
+  }
+
   getDevtoolsUrl() {
     // @ts-ignore 获取私有的targetId
     const pageId = this.page.target()._targetId;

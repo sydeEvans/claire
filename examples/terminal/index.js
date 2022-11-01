@@ -1,6 +1,10 @@
 const { App } = require('../../cjs/index.js');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
+const pty = require('node-pty');
+
+const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
 
 async function main() {
   const app = App();
@@ -10,33 +14,26 @@ async function main() {
       title: 'app',
       icon: fs.readFileSync(path.join(__dirname, 'app_icon.png')).toString('base64'),
     },
-    // serverFolder: path.join(__dirname, 'www'),
-    serverOrigin: 'http://localhost:5173/',
-  });
-
-  await app.expoFunction('systeminfo', () => {
-    return {
-      os: process.arch,
-      env: process.env,
-    };
-  });
-
-  await app.expoFunction('openWindow', async (url) => {
-    const newWindow = await app.createWindow(url, {
-      width: 390,
-      height: 884,
-    });
-    return newWindow.getDevtoolsUrl();
-  });
-
-  await app.expoFunction('openDevtools', async (url) => {
-    await app.createWindow(url, {
-      width: 800,
-      height: 600,
-    });
+    serverFolder: path.join(__dirname, 'www'),
   });
 
   await app.load('index.html');
+
+  setInterval(() => {
+    app.dispatchEvent('data', 'hello');
+  }, 1000);
+
+  // const ptyProcess = pty.spawn(shell, [], {
+  //   name: 'xterm-color',
+  //   cols: 80,
+  //   rows: 30,
+  //   cwd: process.env.HOME,
+  //   env: process.env,
+  // });
+  //
+  // ptyProcess.onData((data) => {
+  //
+  // });
 
   app.on('exit', () => {
     process.exit();
