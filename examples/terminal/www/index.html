@@ -1,33 +1,50 @@
 <html>
-    <head>
-        <link rel="shortcut icon" href="favicon.ico" sizes="256x256"/>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.0.0/css/xterm.css">
-        <style>
-            *{
-                padding: 0;
-                margin: 0;
-            }
-            #terminal{
-                width: 100%;
-                height: 100vh;
-            }
-            .terminal{
-                height: 100%;
-            }
-        </style>
-        <title>Terminal App</title>
-        <script src="https://cdn.jsdelivr.net/npm/xterm@5.0.0/lib/xterm.min.js"></script>
-    </head>
-    <body>
-        <div id="terminal"></div>
-        <script>
-            const term = new Terminal();
-            term.open(document.getElementById('terminal'));
-            term.write('Hello from \x1B[1;3;31mxterm.js\x1B[0m $ ')
+<head>
+    <link rel="shortcut icon" href="favicon.ico" sizes="256x256"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.0.0/css/xterm.css">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        body{
+            height: 100vh;
+        }
+        #terminal {
+            height: 100%;
+        }
+    </style>
+    <title>Terminal App</title>
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.0.0/lib/xterm.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.6.0/lib/xterm-addon-fit.min.js"></script>
+</head>
+<body>
+<div id="terminal"></div>
+<script>
+    const term = new Terminal();
+    const fitAddon = new FitAddon.FitAddon();
 
-            window.claire.on('data', () => {
-                console.log('data')
-            });
-        </script>
-    </body>
+    term.loadAddon(fitAddon);
+
+    term.onData(data => {
+        window.claire.call(
+            'rpc',
+            {
+                domain: 'Custom',
+                method: 'writeData',
+                params: [data],
+            }
+        );
+    });
+
+    window.claire.on('data', (message) => {
+        term.write(message)
+    });
+
+    term.open(document.getElementById('terminal'));
+
+    fitAddon.fit();
+
+</script>
+</body>
 </html>

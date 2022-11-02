@@ -21,21 +21,23 @@ async function main() {
 
   await app.load("index.html");
 
-  setInterval(() => {
-    app.dispatchEvent("data", "hello");
-  }, 1000);
+  const ptyProcess = pty.spawn(shell, [], {
+    name: "xterm-color",
+    cols: 80,
+    rows: 30,
+    cwd: process.env.HOME,
+    env: process.env,
+  });
 
-  // const ptyProcess = pty.spawn(shell, [], {
-  //   name: 'xterm-color',
-  //   cols: 80,
-  //   rows: 30,
-  //   cwd: process.env.HOME,
-  //   env: process.env,
-  // });
-  //
-  // ptyProcess.onData((data) => {
-  //
-  // });
+  app.registerRpcMethod("writeData", async (data) => {
+    ptyProcess.write(data);
+  });
+
+  ptyProcess.onData((data) => {
+    app.dispatchEvent("data", data);
+  });
+
+  // ptyProcess.
 
   app.on("exit", () => {
     process.exit();

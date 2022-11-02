@@ -56,7 +56,12 @@ export class WindowManager implements IWindowManager {
           });
       },
       on: (name, callback) => {
-        document.addEventListener('claire_message' + name, callback);
+        window.addEventListener('message', (message) => {
+          const { data } = message;
+            if (data?.name === name) {
+              callback(data.data);
+            }
+        });
       }
     };`);
 
@@ -74,7 +79,7 @@ export class WindowManager implements IWindowManager {
   }
 
   dispatchEvent(name: string, data: any) {
-    this.mainWindow.dispatchEvent(name, data);
+    return this.mainWindow.dispatchEvent(name, data);
   }
 
   registerRpcDomain(domain: string, rpcDomainInstance: any) {

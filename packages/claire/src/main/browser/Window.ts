@@ -20,10 +20,15 @@ export class BrowserWindow extends EventEmitter {
   }
 
   async dispatchEvent(name: string, data: any) {
-    await this.page.evaluate(() => {
-      const event = new CustomEvent(`claire_message${name}`, {});
-      document.dispatchEvent(event);
-    });
+    await this.page.evaluate(
+      (messageData) => {
+        window.postMessage(messageData);
+      },
+      {
+        name,
+        data,
+      },
+    );
   }
 
   getDevtoolsUrl() {
