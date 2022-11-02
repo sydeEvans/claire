@@ -1,26 +1,28 @@
-const { App } = require('../../cjs/index.js');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const pty = require('node-pty');
+const { App } = require("../../packages/claire");
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
+const pty = require("node-pty");
 
-const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
+const shell = os.platform() === "win32" ? "powershell.exe" : "bash";
 
 async function main() {
   const app = App();
 
   await app.launch({
     browserOptions: {
-      title: 'app',
-      icon: fs.readFileSync(path.join(__dirname, 'app_icon.png')).toString('base64'),
+      title: "app",
+      icon: fs
+        .readFileSync(path.join(__dirname, "app_icon.png"))
+        .toString("base64"),
     },
-    serverFolder: path.join(__dirname, 'www'),
+    serverFolder: path.join(__dirname, "www"),
   });
 
-  await app.load('index.html');
+  await app.load("index.html");
 
   setInterval(() => {
-    app.dispatchEvent('data', 'hello');
+    app.dispatchEvent("data", "hello");
   }, 1000);
 
   // const ptyProcess = pty.spawn(shell, [], {
@@ -35,7 +37,7 @@ async function main() {
   //
   // });
 
-  app.on('exit', () => {
+  app.on("exit", () => {
     process.exit();
   });
 }
