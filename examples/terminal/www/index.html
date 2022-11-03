@@ -9,6 +9,7 @@
         }
         body{
             height: 100vh;
+            font-family: Monaco;
         }
         #terminal {
             height: 100%;
@@ -21,7 +22,10 @@
 <body>
 <div id="terminal"></div>
 <script>
-    const term = new Terminal();
+    const term = new Terminal({
+        fontSize: 13,
+        fontFamily: 'Monaco'
+    });
     const fitAddon = new FitAddon.FitAddon();
 
     term.loadAddon(fitAddon);
