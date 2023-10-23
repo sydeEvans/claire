@@ -42,7 +42,7 @@ function App() {
         type={'primary'}
         onClick={async () => {
           const { devtool_app } = await openWindow('https://www.taobao.com');
-          await openDevtools(`http://localhost:5173/devtool.html?devtool_app=${devtool_app}`);
+          await openDevtools(`http://localhost:5173/devtool.html?devtool_app=${encodeURIComponent(devtool_app)}`);
         }}
       >
         开始调试

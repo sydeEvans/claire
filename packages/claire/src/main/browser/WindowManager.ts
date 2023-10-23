@@ -1,5 +1,5 @@
 import { createDecorator } from '@/common/instantiation/createDecorator';
-import puppeteer from 'puppeteer-core';
+import { Page, Target } from 'puppeteer-core';
 import { BrowserWindow } from '@/main/browser/Window';
 
 export interface IWindowOptions {
@@ -16,7 +16,7 @@ export interface IPendingWindow {
 
 export interface IWindowManager {
   mainWindow: BrowserWindow;
-  createMainWindow: (page: puppeteer.Page) => Promise<void>;
+  createMainWindow: (page: Page) => Promise<void>;
   createWindow: (url: string, options: IWindowOptions) => Promise<BrowserWindow>;
   registerRpcDomain: (domain: string, rpcDomainInstance: any) => void;
   registerCustomRpcMethod: (method: string, func: Function) => void;
@@ -33,13 +33,13 @@ export class WindowManager implements IWindowManager {
 
   private rpcDomainMap: Map<string, any> = new Map();
 
-  async createMainWindow(page: puppeteer.Page) {
+  async createMainWindow(page: Page) {
     this.mainWindow = new BrowserWindow(this, page);
     page.browser().on('targetcreated', this.targetCreated_.bind(this));
     await this._bindBridge(page);
   }
 
-  private async _bindBridge(page: puppeteer.Page) {
+  private async _bindBridge(page: Page) {
     await page.evaluateOnNewDocument(`
     window.claire = {
       call: (method, data, options) => {
@@ -111,7 +111,7 @@ export class WindowManager implements IWindowManager {
     });
   }
 
-  async targetCreated_(target: puppeteer.Target) {
+  async targetCreated_(target: Target) {
     const newTargetPage = await target.page();
     if (!newTargetPage) {
       // no page target

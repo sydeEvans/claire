@@ -1,7 +1,7 @@
-import type { IBrowserOptions } from '@/main/browser/Browser';
+import type { IBrowserOptions } from '@/main/browser/ClaireBrowser';
 import { InstantiationService, ServiceCollection } from '@/common/instantiation';
 import { ServicesAccessor } from '@/common/instantiation/instantiationService';
-import { Browser, IBrowser } from '@/main/browser/Browser';
+import { ClaireBrowser, IBrowser } from '@/main/browser/ClaireBrowser';
 import { ISimpleHttpServer, SimpleHttpServer } from '@/main/SimpleHttpServer';
 import { EventEmitter } from 'events';
 import { IWindowManager, IWindowOptions, WindowManager } from '@/main/browser/WindowManager';
@@ -26,7 +26,7 @@ export class Application extends EventEmitter {
 
     // register service
     services.set(ISimpleHttpServer, SimpleHttpServer);
-    services.set(IBrowser, Browser);
+    services.set(IBrowser, ClaireBrowser);
     services.set(IWindowManager, WindowManager);
 
     const instantiationService = new InstantiationService(services);

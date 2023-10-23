@@ -3,7 +3,6 @@ import './App.css';
 import qs from 'query-string';
 
 const query = qs.parse(window.location.search);
-
 function App() {
   return (
     <div className="app">

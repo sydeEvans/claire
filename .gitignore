@@ -131,3 +131,4 @@ lib
 storybook-static
 esm
 cjs
+pnpm-lock.yaml
