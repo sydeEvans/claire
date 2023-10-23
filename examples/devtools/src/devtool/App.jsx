@@ -1,8 +1,10 @@
 import { Tabs } from 'antd';
 import './App.css';
 import qs from 'query-string';
+import React from "react";
 
 const query = qs.parse(window.location.search);
+
 function App() {
   return (
     <div className="app">

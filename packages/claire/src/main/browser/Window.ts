@@ -37,12 +37,6 @@ export class BrowserWindow extends EventEmitter {
     const { DevToolsLocal } = require('puppeteer-extra-plugin-devtools/lib/RemoteDevTools');
     const devToolsLocal = new DevToolsLocal(this.page.browser().wsEndpoint());
 
-    // console.log(this.page.browser().wsEndpoint())
-    // console.log(devToolsLocal, '----');
-    // console.log(devToolsLocal.url);
-    //
-    // console.log(devToolsLocal.getUrlForPageId(pageId))
-
     const inspector = `${devToolsLocal.url}/devtools/inspector.html?ws=${devToolsLocal.wsHost}:${devToolsLocal.wsPort}/devtools/page/${pageId}`;
     const devtool_app = `${devToolsLocal.url}/devtools/devtools_app.html?ws=${devToolsLocal.wsHost}:${devToolsLocal.wsPort}/devtools/page/${pageId}`;
 

@@ -91,6 +91,7 @@ export class ClaireBrowser implements IBrowser {
             '--test-type',
             `--app=data:text/html,${targetPage}`,
             '--enable-features=NetworkService,NetworkServiceInProcess',
+            '--remote-allow-origins=*',
         ];
 
         if (options.args) args.push(...options.args);
